@@ -8,13 +8,16 @@ Sandboxed Docker environment for running Letta Code in YOLO mode.
 # Build the image
 docker build -t ellm-dev .
 
-# First run: create persistent container
-docker run -it --name ellm-dev ellm-dev
+# First run: create persistent container with C:\Git mounted
+docker run -it --name ellm-dev -v C:\Git:/workspace/git ellm-dev
 
 # Inside container
 letta -n Opus --yolo
 # or
 letta -n Sonnet --yolo
+
+# Open additional shells into same container
+docker exec -it ellm-dev bash
 
 # Later: restart same container
 docker start -ai ellm-dev
@@ -24,6 +27,7 @@ docker start -ai ellm-dev
 
 - **Agent brain** (memory, state) lives on your Letta server
 - **Tool execution** (Bash, Read, Write) runs inside the container
-- Result: YOLO mode without risk to your host filesystem
+- **C:\Git** is mounted at `/workspace/git` — full read/write access to repos
+- Rest of host filesystem remains isolated (no `rm -rf jamesBabyPictures`)
 
 See [How2Yolo.md](How2Yolo.md) for full design details.

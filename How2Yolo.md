@@ -35,7 +35,7 @@ If LC runs in a Docker container pointing at James's server via `LETTA_BASE_URL`
 │  ┌─────────┴───────────────────────┐    │
 │  │ Docker: ellm-dev (shared)       │    │
 │  │ - YOLO mode                     │    │
-│  │ - Cloned repos                  │    │
+│  │ - C:\Git mounted at /workspace/git  │
 │  │ - Tool execution sandboxed      │    │
 │  │ - Opus & Sonnet both work here  │    │
 │  └─────────────────────────────────┘    │
@@ -51,7 +51,7 @@ If LC runs in a Docker container pointing at James's server via `LETTA_BASE_URL`
 | **Base image** | `debian:bookworm-slim` + Node 20 + uv + Python 3.13 + git | Slim, explicit, good package availability |
 | **Host networking** | `host.docker.internal:8283` | Docker Desktop provides this on Windows; no `--network host` needed |
 | **Server bind** | `0.0.0.0:8283` ✓ | Verified — container can reach it |
-| **Repo storage** | Clone inside container | Isolation is the point; mounts defeat it + WSL2 perf issues |
+| **Repo storage** | Mount `C:\Git` at `/workspace/git` | Full access to repos, rest of host isolated |
 | **Container count** | **One shared container** | Both agents work in same workspace; simpler |
 | **Persistence** | **Persistent** (`docker start/stop`) | Avoid recloning repos each session |
 | **Git credentials** | **James controls git initially** | We request, he executes; open up later |
@@ -106,24 +106,25 @@ CMD ["bash"]
 # Build the image (from this directory)
 docker build -t ellm-dev .
 
-# First run: create persistent container
-docker run -it --name ellm-dev `
-  -e LETTA_BASE_URL="http://host.docker.internal:8283" `
-  ellm-dev
+# First run: create persistent container with C:\Git mounted
+docker run -it --name ellm-dev -v C:\Git:/workspace/git ellm-dev
 
 # Inside container — either agent can connect
 letta -n Opus --yolo
 # or
 letta -n Sonnet --yolo
 
+# Open additional shells into same container
+docker exec -it ellm-dev bash
+
 # Later: restart same container
 docker start -ai ellm-dev
 ```
 
-**Git workflow (initially):**
-- Agents request git operations (clone, push, etc.)
-- James executes from host or inside container
-- Can open up later once basics are working
+**Filesystem access:**
+- `C:\Git` mounted read-write at `/workspace/git`
+- Rest of host filesystem remains isolated
+- Git credentials: James controls initially, can open up later
 
 ---
 
@@ -132,6 +133,10 @@ docker start -ai ellm-dev
 - [x] Verify Letta server bind address (0.0.0.0 ✓)
 - [x] Decide persistent vs ephemeral (persistent ✓)
 - [x] Decide container count (one shared ✓)
-- [ ] Build and test the Dockerfile
-- [ ] Clone a test repo, verify LC YOLO works
+- [x] Build and test the Dockerfile ✓
+- [x] Verify LC YOLO works ✓
+- [x] Verify sandbox isolation (edit from container failed correctly) ✓
+- [x] Add color support (TERM + COLORTERM) ✓
+- [x] Disable auto-update (DISABLE_AUTOUPDATER) ✓
+- [x] Mount C:\Git for repo access ✓
 - [ ] First project: async agent comms in LC
