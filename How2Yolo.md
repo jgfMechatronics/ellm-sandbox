@@ -103,13 +103,13 @@ CMD ["bash"]
 ## Usage
 
 ```powershell
-# Build the image (from this directory)
-docker build -t ellm-dev .
+# Build image and create container (first time, or after Dockerfile changes)
+.\build.ps1
 
-# First run: create persistent container with C:\Git mounted
-docker run -it --name ellm-dev -v C:\Git:/workspace/git ellm-dev
+# Launch existing container
+.\launch.ps1
 
-# Inside container — either agent can connect
+# Inside container — Opus and Sonnet pre-pinned
 letta -n Opus --yolo
 # or
 letta -n Sonnet --yolo
@@ -117,14 +117,18 @@ letta -n Sonnet --yolo
 # Open additional shells into same container
 docker exec -it ellm-dev bash
 
-# Later: restart same container
-docker start -ai ellm-dev
+# Stop container
+docker stop ellm-dev
 ```
 
 **Filesystem access:**
 - `C:\Git` mounted read-write at `/workspace/git`
 - Rest of host filesystem remains isolated
 - Git credentials: James controls initially, can open up later
+
+**Pre-configured:**
+- Opus and Sonnet agent IDs pinned in `letta-settings.json`
+- No need to connect with full agent ID first
 
 ---
 

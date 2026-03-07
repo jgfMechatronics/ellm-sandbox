@@ -5,13 +5,13 @@ Sandboxed Docker environment for running Letta Code in YOLO mode.
 ## Quick Start
 
 ```powershell
-# Build the image
+# Build the image (first time only)
 docker build -t ellm-dev .
 
-# First run: create persistent container with C:\Git mounted
-docker run -it --name ellm-dev -v C:\Git:/workspace/git ellm-dev
+# Launch (creates or starts container with C:\Git mounted)
+.\launch.ps1
 
-# Inside container
+# Inside container (Opus and Sonnet pre-pinned)
 letta -n Opus --yolo
 # or
 letta -n Sonnet --yolo

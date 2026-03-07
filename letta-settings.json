@@ -1,0 +1,21 @@
+{
+  "tokenStreaming": false,
+  "showCompactions": false,
+  "enableSleeptime": false,
+  "conversationSwitchAlertEnabled": false,
+  "sessionContextEnabled": true,
+  "memoryReminderInterval": 25,
+  "reflectionTrigger": "step-count",
+  "reflectionBehavior": "reminder",
+  "reflectionStepCount": 25,
+  "pinnedAgentsByServer": {
+    "host.docker.internal:8283": [
+      "agent-97fff6de-4d5e-4820-b459-0918489b0a02",
+      "agent-ed4e2792-d2d9-45c3-8646-1eb57113d35f"
+    ]
+  },
+  "pinnedAgents": [
+    "agent-97fff6de-4d5e-4820-b459-0918489b0a02",
+    "agent-ed4e2792-d2d9-45c3-8646-1eb57113d35f"
+  ]
+}

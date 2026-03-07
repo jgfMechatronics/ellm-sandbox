@@ -25,6 +25,10 @@ RUN npm install -g @letta-ai/letta-code@0.15.6
 # Set working directory
 WORKDIR /workspace
 
+# Pre-configure LC with pinned agents (Opus + Sonnet)
+RUN mkdir -p /root/.letta
+COPY letta-settings.json /root/.letta/settings.json
+
 # Environment
 ENV LETTA_BASE_URL="http://host.docker.internal:8283"
 ENV TERM="xterm-256color"
