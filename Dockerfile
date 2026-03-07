@@ -25,8 +25,11 @@ RUN npm install -g @letta-ai/letta-code@0.15.6
 # Set working directory
 WORKDIR /workspace
 
-# Default to connecting to host Letta server
+# Environment
 ENV LETTA_BASE_URL="http://host.docker.internal:8283"
+ENV TERM="xterm-256color"
+ENV COLORTERM="truecolor"
+ENV DISABLE_AUTOUPDATER="1"
 
 # Entry point
 CMD ["bash"]
