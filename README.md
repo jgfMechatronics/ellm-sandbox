@@ -2,6 +2,9 @@
 
 Sandboxed Docker environment for running Letta Code in YOLO mode.
 
+## DISCLAIMER
+No guarentees are made about the quality of the sandboxing! I am new to docker and so I am not 100% confident in the isolation! Use at your own risk!
+
 ## Quick Start
 
 ```powershell
