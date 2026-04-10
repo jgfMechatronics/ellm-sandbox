@@ -19,8 +19,9 @@ ENV PATH="/root/.local/bin:$PATH"
 # Install Python 3.13 via uv (Letta requires <3.14)
 RUN uv python install 3.13
 
-# Install Letta Code (pinned - 0.17.1 has default conversation bug)
-RUN npm install -g @letta-ai/letta-code@0.15.6
+# Install Letta Code from local build
+COPY letta-ai-letta-code-0.15.6.tgz /tmp/letta-code.tgz
+RUN npm install -g /tmp/letta-code.tgz && rm /tmp/letta-code.tgz
 
 # Set working directory
 WORKDIR /workspace
