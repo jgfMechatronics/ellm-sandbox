@@ -38,6 +38,6 @@ mv "$TARBALL" "$SANDBOX_DIR/"
 # --- Update Dockerfile COPY line ---
 DOCKERFILE="$SANDBOX_DIR/Dockerfile"
 echo ">>> Updating Dockerfile COPY line to $TARBALL..."
-sed -i "s/COPY letta-ai-letta-code-.*\.tgz/COPY $TARBALL/" "$DOCKERFILE"
+sed -i "s/COPY letta-ai-letta-code-.*\.tgz/COPY $TARBALL \/tmp\/letta-code.tgz/" "$DOCKERFILE"
 
 echo ">>> Done: $SANDBOX_DIR/$TARBALL"

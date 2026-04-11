@@ -20,7 +20,7 @@ ENV PATH="/root/.local/bin:$PATH"
 RUN uv python install 3.13
 
 # Install Letta Code from local build
-COPY letta-ai-letta-code-0.15.6.tgz
+COPY letta-ai-letta-code-0.15.6.tgz /tmp/letta-code.tgz
 RUN npm install -g /tmp/letta-code.tgz && rm /tmp/letta-code.tgz
 
 # Set working directory
