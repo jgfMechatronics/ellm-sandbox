@@ -19,6 +19,12 @@ ENV PATH="/root/.local/bin:$PATH"
 # Install Python 3.13 via uv (Letta requires <3.14)
 RUN uv python install 3.13
 
+# Create shared Python venv for scripts (group_chat.py etc.)
+RUN uv venv /opt/ellm --python 3.13 && \
+    uv pip install --python /opt/ellm/bin/python3 \
+        prompt_toolkit  # group_chat.py
+ENV PATH="/opt/ellm/bin:$PATH"
+
 # Install Letta Code from local build
 COPY letta-ai-letta-code-0.15.6.tgz /tmp/letta-code.tgz
 RUN npm install -g /tmp/letta-code.tgz && rm /tmp/letta-code.tgz
@@ -31,8 +37,8 @@ RUN mkdir -p /root/.letta
 COPY letta-settings.json /root/.letta/settings.json
 
 # Environment
-ENV LETTA_BASE_URL="http://host.docker.internal:8283"
 ENV TERM="xterm-256color"
+ENV LETTA_BASE_URL="http://host.docker.internal:8283"
 ENV COLORTERM="truecolor"
 ENV DISABLE_AUTOUPDATER="1"
 

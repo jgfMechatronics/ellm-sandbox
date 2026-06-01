@@ -21,9 +21,13 @@ fi
 
 export PATH="$HOME/.bun/bin:$PATH"
 
+# --- Install dependencies ---
+echo ">>> Installing dependencies..."
+cd "$LETTA_CODE_DIR"
+bun install
+
 # --- Build ---
 echo ">>> Building LettaCode..."
-cd "$LETTA_CODE_DIR"
 bun run build
 
 # --- Pack ---
