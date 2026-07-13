@@ -1,0 +1,28 @@
+#!/bin/bash
+# Usage: agent-commit <AgentName> [git commit args...]
+# Sets both author and committer to the agent, avoiding config pollution.
+
+set -e
+
+if [ -z "$1" ]; then
+    echo "Usage: agent-commit <AgentName> [git commit args...]" >&2
+    echo "Example: agent-commit Opus -m \"Fix the thing\"" >&2
+    exit 1
+fi
+
+AGENT=$1
+shift
+
+case "$AGENT" in
+    Opus)   EMAIL="opus@placeholder.dev" ;;
+    Sonnet) EMAIL="sonnet@placeholder.dev" ;;
+    Haiku)  EMAIL="haiku@placeholder.dev" ;;
+    *)
+        echo "Unknown agent: $AGENT" >&2
+        echo "Valid agents: Opus, Sonnet, Haiku" >&2
+        exit 1
+        ;;
+esac
+
+GIT_COMMITTER_NAME="$AGENT" GIT_COMMITTER_EMAIL="$EMAIL" \
+    git commit --author="$AGENT <$EMAIL>" "$@"
