@@ -55,5 +55,5 @@ ENV LETTA_BASE_URL="http://host.docker.internal:8283"
 ENV COLORTERM="truecolor"
 ENV DISABLE_AUTOUPDATER="1"
 
-# Entry point
-CMD ["bash"]
+# Start Desktop Commander fs_proxy in background, then enter bash
+CMD ["bash", "-c", "cd /workspace/git/Agent-Home && uv run fs_proxy & bash"]
