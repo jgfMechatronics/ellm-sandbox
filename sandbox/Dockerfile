@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     git \
     build-essential \
     ca-certificates \
+    nano \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node 20 LTS
@@ -49,6 +50,7 @@ WORKDIR /workspace
 
 # Environment
 ENV TERM="xterm-256color"
+ENV EDITOR="nano"
 ENV LETTA_BASE_URL="http://host.docker.internal:8283"
 ENV COLORTERM="truecolor"
 ENV DISABLE_AUTOUPDATER="1"

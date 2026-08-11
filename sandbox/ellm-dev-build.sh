@@ -26,5 +26,6 @@ echo -e "\033[36mCreating container with ~/git mounted...\033[0m"
 docker run -it \
     --name "$CONTAINER_NAME" \
     --add-host host.docker.internal:host-gateway \
+    -p 8080:8080 \
     -v "$GIT_MOUNT" \
     "$IMAGE_NAME"
