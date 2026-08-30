@@ -56,4 +56,4 @@ ENV COLORTERM="truecolor"
 ENV DISABLE_AUTOUPDATER="1"
 
 # Start Desktop Commander fs_proxy in background, then enter bash
-CMD ["bash", "-c", "cd /workspace/git/Agent-Home/mcp_tools && uv run fs_proxy.py & bash"]
+CMD ["bash", "-c", "cd /workspace/git/Agent-Home/mcp_tools && uv run fs_proxy.py --host 0.0.0.0 & bash"]

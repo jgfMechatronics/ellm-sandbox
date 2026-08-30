@@ -5,9 +5,21 @@
 
 set -e
 
-CONTAINER_NAME="ellm-dev"
+# Load .env if present (allows overriding AGENT_SANDBOX_CONTAINER_NAME and ELLM_AGENT_NETWORK)
+if [ -f .env ]; then
+    set -a && source .env && set +a
+fi
+
+CONTAINER_NAME="${AGENT_SANDBOX_CONTAINER_NAME:-ellm-dev}"
+NETWORK_NAME="${ELLM_AGENT_NETWORK:-agent-home_container_net}"
 IMAGE_NAME="ellm-dev"
 GIT_MOUNT="$HOME/git:/workspace/git"
+
+# Create Docker network if it doesn't exist
+docker network inspect "$NETWORK_NAME" > /dev/null 2>&1 || {
+    echo -e "\033[36mCreating Docker network '$NETWORK_NAME'...\033[0m"
+    docker network create "$NETWORK_NAME"
+}
 
 # Stop and remove existing container if present
 if docker ps -a --format "{{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
@@ -22,10 +34,13 @@ docker build -t "$IMAGE_NAME" .
 
 # Create and start container
 # CRITICAL: --add-host flag required on Linux (Windows Docker Desktop injects this automatically)
+# NOTE: -p 8080:8080 intentionally omitted — fs_proxy is only reachable within the Docker network,
+#       preventing LAN exposure of the unauthenticated MCP endpoint.
 echo -e "\033[36mCreating container with ~/git mounted...\033[0m"
 docker run -it \
     --name "$CONTAINER_NAME" \
+    --network "$NETWORK_NAME" \
+    # TODO: this only required by letta at this point, remove in favor of pure container network when lettn't
     --add-host host.docker.internal:host-gateway \
-    -p 8080:8080 \
     -v "$GIT_MOUNT" \
     "$IMAGE_NAME"
