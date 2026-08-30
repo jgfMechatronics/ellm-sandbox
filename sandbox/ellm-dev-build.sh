@@ -43,4 +43,5 @@ docker run -it \
     # TODO: this only required by letta at this point, remove in favor of pure container network when lettn't
     --add-host host.docker.internal:host-gateway \
     -v "$GIT_MOUNT" \
-    "$IMAGE_NAME"
+    "$IMAGE_NAME" \
+    bash -c "cd /workspace/git/Agent-Home/mcp_tools && uv run fs_proxy.py --host 0.0.0.0 --allowed-host $CONTAINER_NAME & bash"
