@@ -43,5 +43,5 @@ docker run -it \
     -p "${BRIDGE_IP}:8080:8080" \
     -v "$GIT_MOUNT" \
     "$IMAGE_NAME" \
-    bash -c "cd /workspace/git/Agent-Home/mcp_tools && uv run fs_proxy.py --host 0.0.0.0 --allowed-host $CONTAINER_NAME & bash"
+    bash -c "cd /workspace/git/Agent-Home/mcp_tools && uv run fs_proxy.py --host 0.0.0.0 --allowed-host host.docker.internal & bash"
 # TODO: host.docker.internal only required by letta at this point, remove when lettn't
