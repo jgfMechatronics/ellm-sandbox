@@ -5,21 +5,20 @@
 
 set -e
 
-# Load .env if present (allows overriding AGENT_SANDBOX_CONTAINER_NAME and ELLM_AGENT_NETWORK)
-if [ -f .env ]; then
-    set -a && source .env && set +a
-fi
-
-CONTAINER_NAME="${AGENT_SANDBOX_CONTAINER_NAME:-ellm-dev}"
-NETWORK_NAME="${ELLM_AGENT_NETWORK:-agent-home_container_net}"
+CONTAINER_NAME="ellm-dev"
 IMAGE_NAME="ellm-dev"
 GIT_MOUNT="$HOME/git:/workspace/git"
 
-# Create Docker network if it doesn't exist
-docker network inspect "$NETWORK_NAME" > /dev/null 2>&1 || {
-    echo -e "\033[36mCreating Docker network '$NETWORK_NAME'...\033[0m"
-    docker network create "$NETWORK_NAME"
-}
+# Determine Docker bridge gateway IP so fs_proxy is only reachable via the bridge
+# (accessible to containers using host.docker.internal, not exposed to LAN).
+# Abort if the IP cannot be determined — an empty value would cause Docker to
+# fall back to 0.0.0.0, exposing fs_proxy to the LAN.
+BRIDGE_IP=$(docker network inspect bridge --format='{{range .IPAM.Config}}{{.Gateway}}{{end}}')
+if [ -z "$BRIDGE_IP" ] || [ "$BRIDGE_IP" = "0.0.0.0" ]; then
+    echo -e "\033[31mERROR: Could not determine Docker bridge IP. Aborting to prevent LAN exposure of fs_proxy.\033[0m"
+    exit 1
+fi
+echo -e "\033[36mDocker bridge IP: $BRIDGE_IP\033[0m"
 
 # Stop and remove existing container if present
 if docker ps -a --format "{{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
@@ -34,15 +33,15 @@ docker build -t "$IMAGE_NAME" .
 
 # Create and start container
 # CRITICAL: --add-host flag required on Linux (Windows Docker Desktop injects this automatically)
-# NOTE: -p 8080:8080 intentionally omitted — fs_proxy is only reachable within the Docker network,
-#       preventing LAN exposure of the unauthenticated MCP endpoint.
+# fs_proxy is published only on the Docker bridge IP — reachable by Agent Home via
+# host.docker.internal but not from the LAN. The sandbox has no access to Agent Home's
+# port (bound to 127.0.0.1 only), enforcing the invariant that agents cannot reach the server API.
 echo -e "\033[36mCreating container with ~/git mounted...\033[0m"
 docker run -it \
     --name "$CONTAINER_NAME" \
-    --network "$NETWORK_NAME" \
     --add-host host.docker.internal:host-gateway \
+    -p "${BRIDGE_IP}:8080:8080" \
     -v "$GIT_MOUNT" \
     "$IMAGE_NAME" \
     bash -c "cd /workspace/git/Agent-Home/mcp_tools && uv run fs_proxy.py --host 0.0.0.0 --allowed-host $CONTAINER_NAME & bash"
-# TODO: host.docker.internal only required by letta at this point, remove in favor of pure container network when lettn't
-
+# TODO: host.docker.internal only required by letta at this point, remove when lettn't
