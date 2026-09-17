@@ -25,9 +25,10 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin s
 ENV UV_PYTHON_INSTALL_DIR=/opt/uv/python
 RUN uv python install 3.13 && chmod -R a+w /opt/uv/python
 
-# Create shared Python venv for scripts
+# Create shared Python venv for scripts (group_chat.py etc.)
 RUN uv venv /opt/ellm --python 3.13 && \
-    uv pip install --python /opt/ellm/bin/python3
+    uv pip install --python /opt/ellm/bin/python3 \
+        prompt_toolkit  # group_chat.py
 ENV PATH="/opt/ellm/bin:$PATH"
 
 # Install agent-commit script for clean git identity
