@@ -7,6 +7,8 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     ca-certificates \
     nano \
+    clang \
+    mold \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node 20 LTS
@@ -44,6 +46,10 @@ RUN mkdir -p /home/ellm/.letta && chown ellm:ellm /home/ellm/.letta
 COPY --chown=ellm:ellm letta-settings.json /home/ellm/.letta/settings.json
 
 USER ellm
+
+# Install Rust toolchain via rustup
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.90.0
+ENV PATH="/home/ellm/.cargo/bin:$PATH"
 
 # Set working directory
 WORKDIR /workspace
