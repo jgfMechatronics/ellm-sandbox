@@ -37,11 +37,13 @@ docker build -t "$IMAGE_NAME" .
 # host.docker.internal but not from the LAN. The sandbox has no access to Agent Home's
 # port (bound to 127.0.0.1 only), enforcing the invariant that agents cannot reach the server API.
 echo -e "\033[36mCreating container with ~/git mounted...\033[0m"
-docker run -it \
+docker run -d \
     --name "$CONTAINER_NAME" \
     --add-host host.docker.internal:host-gateway \
     -p "${BRIDGE_IP}:8080:8080" \
     -v "$GIT_MOUNT" \
     "$IMAGE_NAME" \
-    bash -c "cd /workspace/git/Agent-Home/mcp_tools && uv run fs_proxy.py --host 0.0.0.0 --allowed-host host.docker.internal & bash"
-# TODO: host.docker.internal only required by letta at this point, remove when lettn't
+    bash -c "cd /workspace/git/Agent-Home/mcp_tools && uv run fs_proxy.py --host 0.0.0.0 --allowed-host host.docker.internal"
+
+echo -e "\033[32mContainer started! To get a shell:\033[0m"
+echo -e "\033[32m  docker exec -it $CONTAINER_NAME bash\033[0m"
