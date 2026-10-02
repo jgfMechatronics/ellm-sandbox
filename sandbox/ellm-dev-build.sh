@@ -7,7 +7,10 @@ set -e
 
 CONTAINER_NAME="ellm-dev"
 IMAGE_NAME="ellm-dev"
-GIT_MOUNT="$HOME/git:/workspace/git"
+
+# Mount path — same absolute path on host and in container for venv symlink compatibility
+GIT_PATH="$HOME/git"
+GIT_MOUNT="$GIT_PATH:$GIT_PATH"
 
 # Determine Docker bridge gateway IP so fs_proxy is only reachable via the bridge
 # (accessible to containers using host.docker.internal, not exposed to LAN).
@@ -27,23 +30,23 @@ if docker ps -a --format "{{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
     docker rm "$CONTAINER_NAME"
 fi
 
-# Build image
+# Build image (pass GIT_PATH so Dockerfile can set UV_PYTHON_INSTALL_DIR)
 echo -e "\033[36mBuilding image...\033[0m"
-docker build -t "$IMAGE_NAME" .
+docker build -t "$IMAGE_NAME" --build-arg "GIT_PATH=$GIT_PATH" .
 
 # Create and start container
 # CRITICAL: --add-host flag required on Linux (Windows Docker Desktop injects this automatically)
 # fs_proxy is published only on the Docker bridge IP — reachable by Agent Home via
 # host.docker.internal but not from the LAN. The sandbox has no access to Agent Home's
 # port (bound to 127.0.0.1 only), enforcing the invariant that agents cannot reach the server API.
-echo -e "\033[36mCreating container with ~/git mounted...\033[0m"
+echo -e "\033[36mCreating container with $GIT_PATH mounted...\033[0m"
 docker run -d \
     --name "$CONTAINER_NAME" \
     --add-host host.docker.internal:host-gateway \
     -p "${BRIDGE_IP}:8080:8080" \
     -v "$GIT_MOUNT" \
     "$IMAGE_NAME" \
-    bash -c "cd /workspace/git/Agent-Home/mcp_tools && uv run fs_proxy.py --host 0.0.0.0 --allowed-host host.docker.internal"
+    bash -c "cd $GIT_PATH/Agent-Home/mcp_tools && uv run fs_proxy.py --host 0.0.0.0 --allowed-host host.docker.internal --pass-env UV_PYTHON_INSTALL_DIR,UV_MANAGED_PYTHON"
 
 echo -e "\033[32mContainer started! To get a shell:\033[0m"
 echo -e "\033[32m  docker exec -it $CONTAINER_NAME bash\033[0m"

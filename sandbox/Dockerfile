@@ -1,5 +1,8 @@
 FROM debian:bookworm-slim
 
+# Build arg for mount path — must match ellm-dev-build.sh GIT_PATH
+ARG GIT_PATH=/home/gossf/git
+
 # Install system deps
 RUN apt-get update && apt-get install -y \
     curl \
@@ -20,14 +23,18 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 # Install uv (to /usr/local/bin so non-root users can access it)
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
 
-# Install Python 3.13 via uv (required by Letta)
-# UV_PYTHON_INSTALL_DIR puts the interpreter in /opt; chown lets ellm download more versions on demand
-ENV UV_PYTHON_INSTALL_DIR=/opt/uv/python
-RUN uv python install 3.13 && chmod -R a+w /opt/uv/python
+# Install Python 3.13 for container-local tooling (agent-commit, etc.)
+# This stays in /opt — not on the shared mount — because it's container-specific.
+RUN UV_PYTHON_INSTALL_DIR=/opt/uv/python uv python install 3.13
 
-# Create shared Python venv for scripts
-RUN uv venv /opt/ellm --python 3.13
+# Create shared Python venv for scripts (container-local) TODO: might not need this anymroe. Line above could potentially go too.
+RUN UV_PYTHON_INSTALL_DIR=/opt/uv/python uv venv /opt/ellm --python 3.13
 ENV PATH="/opt/ellm/bin:$PATH"
+
+# Runtime UV settings: use managed Python from shared mount so venv symlinks
+# resolve identically on both host and container.
+ENV UV_PYTHON_INSTALL_DIR=${GIT_PATH}/.uv-python
+ENV UV_MANAGED_PYTHON=1
 
 # Install agent-commit script for clean git identity
 COPY agent-commit /opt/ellm/bin/agent-commit
