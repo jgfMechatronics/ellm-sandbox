@@ -46,7 +46,7 @@ docker run -d \
     -p "${BRIDGE_IP}:8080:8080" \
     -v "$GIT_MOUNT" \
     "$IMAGE_NAME" \
-    bash -c "cd $GIT_PATH/Agent-Home/mcp_tools && uv run fs_proxy.py --host 0.0.0.0 --allowed-host host.docker.internal --pass-env UV_PYTHON_INSTALL_DIR,UV_MANAGED_PYTHON"
+    bash -c "cd $GIT_PATH/Agent-Home/src/mcp_tools && uv run fs_proxy.py --host 0.0.0.0 --allowed-host host.docker.internal --pass-env UV_PYTHON_INSTALL_DIR,UV_MANAGED_PYTHON"
 
 echo -e "\033[32mContainer started! To get a shell:\033[0m"
 echo -e "\033[32m  docker exec -it $CONTAINER_NAME bash\033[0m"
