@@ -20,6 +20,12 @@ RUN apt-get update && apt-get install -y \
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
+# Install Claude Code CLI (pinned) — backend for fs_proxy's MCP tool server
+# (claude mcp serve). PIN THE VERSION: CC's tool surface drifts between releases;
+# after any upgrade, verify tools/list still matches the fs_proxy allowlist
+# (Read/Edit/Write/Bash). DISABLE_AUTOUPDATER=1 below prevents runtime drift.
+RUN npm install -g @anthropic-ai/claude-code@2.1.300
+
 # Install uv (to /usr/local/bin so non-root users can access it)
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
 
