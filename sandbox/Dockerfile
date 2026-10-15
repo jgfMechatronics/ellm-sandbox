@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     mold \
     pkg-config \
     libssl-dev \
+    poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node 20 LTS
