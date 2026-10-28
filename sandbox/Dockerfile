@@ -65,5 +65,6 @@ ENV TERM="xterm-256color"
 ENV EDITOR="nano"
 ENV COLORTERM="truecolor"
 ENV DISABLE_AUTOUPDATER="1"
+ENV CLAUDE_CONFIG_DIR=${GIT_PATH}/.claude-ellm
 
 CMD ["bash"]
