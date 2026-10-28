@@ -17,9 +17,11 @@ case "$AGENT" in
     Opus)   EMAIL="opus@placeholder.dev" ;;
     Sonnet) EMAIL="sonnet@placeholder.dev" ;;
     Haiku)  EMAIL="haiku@placeholder.dev" ;;
+    # Stateless Claude Code sessions; the model is recorded in the Co-Authored-By trailer
+    ClaudeCode) AGENT="Claude Code"; EMAIL="claude-code@placeholder.dev" ;;
     *)
         echo "Unknown agent: $AGENT" >&2
-        echo "Valid agents: Opus, Sonnet, Haiku" >&2
+        echo "Valid agents: Opus, Sonnet, Haiku, ClaudeCode" >&2
         exit 1
         ;;
 esac
